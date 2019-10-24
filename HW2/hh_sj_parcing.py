@@ -9,30 +9,32 @@ import time
 
 def get_html(url_, user_agent_):
     html_ = requests.get(url_, headers=user_agent_)
-    print('step 1. get HTML-code from ', url_)
+    print('Парсинг страницы --> ', url_)
     return html_.text
 
 
-def read_write_file(data, file_name, operation, encoding):
+def read_write_file(data_, file_name, operation, encoding):
     with open(file_name, operation, encoding=encoding) as file:
         if operation == 'r':
-            data = file.read()
+            data_ = file.read()
             file.close()
-            return data
+            return data_
         else:
-            file.write(data)
+            file.write(data_)
             file.close()
             return
 
 
 # ### Вводимые аргументы -----------
 # ### ------------------------------
-#job_title = 'детский врач'
-job_title = 'Продавец кассир'
+# job_title = 'детский врач'
+# job_title = 'Продавец-кассир'
+# job_title = 'Секретарь'
+job_title = 'Помощник руководителя'
 hh_area = '1' # Москва
 sj_area = '4' # Москва
-pages = 1
-use_requests = False
+pages = 3
+use_requests = True
 # ### ------------------------------
 
 hh_site_url = 'https://hh.ru'
@@ -127,8 +129,8 @@ for p in range(pages):
             if links.count(link) > 1:
                 links.pop()
                 salary.pop()
-            if links[-1].find(text='У компании есть ещё 1 похожая вакансия') or \
-               links[-1].find(text='У компании есть ещё 2 похожие вакансии'):
+            title = links[-1].getText()
+            if title.find('У компании есть ещё') != -1:
                 links.pop()
                 salary.pop()
             url = sj_site_url + links[-1].get('href')
@@ -160,5 +162,5 @@ for p in range(pages):
 # pprint(sj_data)
 # pprint(len(sj_data))
 data = dict(list(hh_data.items()) + list(sj_data.items()))
-pprint(f'Всего вакансий с 2-х сайтов - len(data)')
 pprint(data)
+print(f'Общее количество вакансий по ключевому слову "{job_title}" = {len(data)}')
